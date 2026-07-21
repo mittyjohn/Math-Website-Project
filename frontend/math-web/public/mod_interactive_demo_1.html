@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modular Arithmetic Playground</title>
+<style>
+
+  /* =========================================================
+     DESIGN TOKENS
+     Bright, cartoony palette. --highlight is used in exactly
+     two places on purpose: the highlighted grid column, and
+     the remainder (r) in the congruence statement, so the two
+     always visually match.
+     ========================================================= */
+  :root{
+    --bg: #FFF6E1;
+    --panel: #FFFFFF;
+    --ink: #26324A;
+    --ink-soft: #5A6478;
+
+    --pink: #FF4C86;       /* == --highlight, used for r / highlighted column */
+    --highlight: #FF4C86;
+    --orange: #FF9E1B;
+    --teal: #22C3B6;
+    --purple: #8355FF;
+    --yellow: #FFD23F;
+
+    --highlight-soft: #FFE1EC;
+
+    --display: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', 'Segoe Print', sans-serif;
+    --body: 'Trebuchet MS', 'Segoe UI', Verdana, sans-serif;
+    --num: 'Trebuchet MS', 'Segoe UI', Verdana, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0;
+    background:
+      radial-gradient(circle at 8% 12%, rgba(255,158,27,0.16) 0, transparent 40%),
+      radial-gradient(circle at 92% 18%, rgba(34,195,182,0.16) 0, transparent 40%),
+      radial-gradient(circle at 50% 95%, rgba(131,85,255,0.14) 0, transparent 45%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    min-height:100vh;
+  }
+  ::selection{ background: var(--highlight-soft); }
+  a, button, input { font-family: inherit; }
+
+  .page{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 30px) clamp(14px, 3vw, 30px) 28px;
+  }
+
+  /* =========================================================
+     PAGE HEADER
+     Trimmed down to just the small pill label — no headline
+     or subtitle, to keep vertical space for the components.
+     ========================================================= */
+  header.top{
+    margin-bottom: clamp(14px, 2.4vw, 20px);
+  }
+  .eyebrow{
+    display:inline-block;
+    font-family: var(--body);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--purple);
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    transform: rotate(-2deg);
+  }
+
+  /* =========================================================
+     SHARED PANEL SHELL — comic-panel look:
+     thick dark outline + solid offset shadow, no soft blur.
+     ========================================================= */
+  .panel{
+    background: var(--panel);
+    border: 3px solid var(--ink);
+    border-radius: 20px;
+    padding: clamp(14px, 2vw, 20px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .panel-title{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+  }
+
+  /* =========================================================
+     LAYOUT
+     Two-column grid: the Number Chart sits on the left, more
+     compact than before; the Congruence Display and Remainder
+     Clock are stacked in a narrower column on the right so all
+     three cards are visible together without scrolling.
+     ========================================================= */
+  .layout{
+    display:grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: clamp(14px, 2.4vw, 22px);
+    align-items: stretch;
+  }
+  /* Left column now holds ONLY the Number Chart card. Make it a flex column so
+     the card stretches to the full height of the right-hand stack (controls +
+     Congruence + Remainder Clock), giving the grid the maximum possible area. */
+  .chart-section{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .chart-panel{
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .chart-panel .panel-head{ flex:0 0 auto; }
+  .side-stack{
+    display:flex;
+    flex-direction: column;
+    gap: clamp(14px, 2.4vw, 22px);
+  }
+  @media (max-width: 760px){
+    .layout{ grid-template-columns: 1fr; }
+    /* Stacked: no tall neighbour to match, so fall back to a square grid
+       sized by width. */
+    .chart-wrap{ display:block; }
+    .chart{ height:auto; aspect-ratio: 1 / 1; }
+  }
+
+  /* =========================================================
+     COMPONENT 1 — NUMBER CHART
+     The n-slider and standard/modular toggle now live in the
+     right-hand column, above the Congruence card, so the whole
+     left column is free for the grid.
+     ========================================================= */
+  .controls{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .control-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    background: #FFF9EC;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 5px 12px 5px 10px;
+  }
+  .control-group label{
+    font-family: var(--body);
+    font-weight: 800;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  /* n slider (range 2-10) */
+  input[type="range"]{
+    -webkit-appearance:none;
+    appearance:none;
+    width: 100px;
+    height: 6px;
+    background: var(--orange);
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    border: 2px solid var(--ink);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width: 20px; height:20px;
+    border-radius:50%;
+    background: var(--yellow);
+    border: 3px solid var(--ink);
+    cursor:pointer;
+    margin-top: -1px;
+  }
+  /**
+  input[type="range"]::-moz-range-thumb{
+    width: 16px; height:16px;
+    border-radius:50%;
+    background: var(--yellow);
+    border: 3px solid var(--ink);
+    cursor:pointer;
+  }**/
+  .n-readout{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--orange);
+    min-width: 1.4ch;
+    text-align:center;
+  }
+
+  /* Standard <-> Modular display toggle button */
+  .toggle-btn{
+    background: var(--teal);
+    border: 2px solid var(--ink);
+    color: #fff;
+    font-family: var(--body);
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .toggle-btn:hover{ transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .toggle-btn:active{ transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+  .toggle-btn:focus-visible{ outline: 3px solid var(--purple); outline-offset:2px; }
+  .toggle-btn .flag{ color: #fff; text-decoration: underline wavy 2px; }
+
+  /* The n×n grid. --n is set from JS and drives column count + font scaling.
+     Legend text and in-card controls are gone, so almost all of the card's
+     space goes to the grid, and it can run bigger. */
+  .chart-wrap{
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+  .chart{
+    display:grid;
+    gap: clamp(3px, 0.5vw, 7px);
+    width: 100%;
+    height: 100%;
+  }
+  .cell{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #FFFCF3;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    font-family: var(--num);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    /* Relative sizing, bumped up now that the card has more room. */
+    font-size: clamp(1.25rem, calc(4.2rem / var(--n)), 2.2rem);
+    padding: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+  }
+  /* Highlighted column = the column whose values are congruent to r (mod n).
+     Uses the SAME --highlight color as the r in the congruence statement. */
+  .cell.hl{
+    background: var(--highlight);
+    border-color: var(--ink);
+    color: #fff;
+    transform: scale(1.04);
+  }
+  .cell .r{ color: var(--purple); font-weight: 800; }
+  .cell.hl .r{ color: #fff; }
+  /* Decomposition mode packs "n(k) + c" into every cell on a single line.
+     JS (fitDecompFont) measures the widest cell and sets --decomp-fs to the
+     biggest size that still fits; the clamp() is just a safe fallback. */
+  .chart.modular .cell{
+    font-size: var(--decomp-fs, clamp(0.7rem, calc(3.5rem / var(--n)), 1.5rem));
+    letter-spacing: -0.01em;
+  }
+
+  /* =========================================================
+     COMPONENT 2 — CONGRUENCE DISPLAY
+     "x ≡ r mod n" (no parentheses) + a plain-language line
+     spelling out the actual numbers, not just letters.
+     ========================================================= */
+  /* Panel title removed, so hero-panel is a flex column and hero-inner
+     grows to fill the card, vertically centering the three cong-blocks
+     in whatever space is available. */
+  .hero-panel{ display:flex; flex-direction:column; }
+  .hero-inner{
+    flex: 1 1 auto;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding: 2px 2px 0;
+  }
+  /* Each of the three repeated "numbers -> ALL: -> statement" sections
+     gets consistent breathing room; the first sits flush with the card top.
+     Left-aligned so the text lines up under the first squircle. */
+  .cong-block{ margin-top: 20px; text-align: left; }
+  .cong-block:first-child{ margin-top: 0; }
+  .congruence{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(24px, 4vw, 34px);
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  .congruence .op{ color: var(--orange); margin: 0 0.2em; }
+  /* n (the divisor) stays neutral ink — it should NOT match the highlight color */
+  .congruence .mod{ color: var(--ink); }
+  /* r (the remainder) is colored to match the highlighted chart column */
+  .congruence .rval{
+    display:inline-block;
+    min-width: 1.1ch;
+    color: var(--highlight);
+    font-weight: 700;
+  }
+  /* List of every member of the highlighted column (n of them, one per
+     row) shown as hot-pink "squircles" with white text — same colors as
+     the highlighted chart column, just in card form. Left-aligned so the
+     first squircle anchors the left edge for the text below it. */
+  .member-squares{
+    display:flex;
+    flex-wrap: nowrap;
+    justify-content:flex-start;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .member-squares .msq{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width: 22px;
+    height: 24px;
+    padding: 0 5px;
+    background: var(--highlight);
+    color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    font-family: var(--num);
+    font-weight: 800;
+    font-size: 11px;
+  }
+  /* "ALL:" sits left-aligned, in line with the squircle list above it. */
+  .then-word{
+    margin: 10px 0 4px;
+    text-align: left;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    text-transform: uppercase;
+    color: var(--purple);
+  }
+  /* Plain-language statement lines below the numbers, styled like the
+     congruence line (same family/weight/letter-spacing) but a touch
+     smaller so the fuller sentences still fit comfortably. */
+  .stmt-line{
+    margin-top: 14px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(18px, 3vw, 26px);
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-align: left;
+    line-height: 1.4;
+  }
+  /* Pink phrases match r; orange phrases match the "mod" word above. */
+  .stmt-line .pink-word{ color: var(--highlight); }
+  .stmt-line .orange-word{ color: var(--orange); }
+
+  /* =========================================================
+     COMPONENT 3 — REMAINDER CLOCK
+     Dial with n ticks, a draggable arrow-shaped hand, and
+     chunky step buttons.
+     ========================================================= */
+  .clock-panel{ text-align:center; }
+  .clock-stage{
+    position: relative;
+    width: min(100%, 268px);
+    aspect-ratio: 1/1;
+    margin: 4px auto 8px;
+    touch-action: none; /* let pointer drag drive rotation instead of page scroll */
+  }
+  .clock-face{
+    width:100%; height:100%;
+    border-radius:50%;
+    background: repeating-conic-gradient(
+      #FFF3D6 0deg 8deg,
+      #FFEAB8 8deg 16deg
+    );
+    border: 4px solid var(--ink);
+    box-shadow: inset 0 0 0 5px #fff, 4px 4px 0 var(--ink);
+    position: relative;
+  }
+  .clock-face::after{
+    content:"";
+    position:absolute;
+    inset: 15%;
+    border-radius:50%;
+    background: #fff;
+    border: 3px solid var(--ink);
+  }
+  /* Tick marks: anchored by their BOTTOM edge to the dial center (50% 100%)
+     so that rotate(0deg) points straight up, matching index 0 at 12 o'clock. */
+  .tick{
+    position:absolute;
+    top:50%; left:50%;
+    width: 3px; height: 9px;
+    background: var(--purple);
+    transform-origin: 50% 100%;
+    border-radius: 2px;
+  }
+  .tick.major{ background: var(--teal); height: 11px; width: 3px; }
+  .tick-label{
+    position:absolute;
+    top:50%; left:50%;
+    font-family: var(--num);
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--ink-soft);
+    width: 20px; height: 20px;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events: none;
+  }
+  .tick-label.active{
+    color: #fff;
+    background: var(--highlight);
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+  }
+
+  /* The draggable hand: a chunky arrow shape via clip-path.
+     Same bottom-anchored rotation convention as .tick above, so
+     rotate(0deg) also points up — keeps hand and tick in agreement. */
+  .hand{
+    position:absolute;
+    top:50%; left:50%;
+    width: 19px;
+    height: 39%;
+    transform-origin: 50% 100%;
+    transform: translate(-50%, -100%) rotate(0deg);
+    cursor: grab;
+    z-index: 2;
+  }
+  .hand-shape{
+    width: 100%; height: 100%;
+    background: var(--pink);
+    border: 3px solid var(--ink);
+    clip-path: polygon(50% 0%, 100% 32%, 74% 32%, 74% 100%, 26% 100%, 26% 32%, 0% 32%);
+  }
+  /* Enlarged invisible hit-area so the hand is easy to grab with a mouse or finger. */
+  .hand::before{
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -16px;
+    width: 42px;
+    height: calc(100% + 16px);
+    transform: translateX(-50%);
+    background: transparent;
+  }
+  .hand.grabbing{ cursor: grabbing; }
+  .hand.grabbing .hand-shape{ background: var(--orange); }
+  .hub{
+    position:absolute;
+    top:50%; left:50%;
+    width: 16px; height:16px;
+    border-radius:50%;
+    background: var(--yellow);
+    border: 3px solid var(--ink);
+    transform: translate(-50%,-50%);
+    z-index: 3;
+  }
+
+  .clock-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .arrow-btn{
+    width: 36px; height:36px;
+    border-radius: 50%;
+    border: 3px solid var(--ink);
+    background: var(--yellow);
+    color: var(--ink);
+    font-weight: 900;
+    font-size: 16px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .arrow-btn:hover{ transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .arrow-btn:active{ transform: translate(2px,2px); box-shadow: 0px 0px 0 var(--ink); }
+  .arrow-btn:focus-visible{ outline: 3px solid var(--purple); outline-offset:2px; }
+  .r-readout{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--ink);
+    min-width: 4ch;
+    text-align:center;
+  }
+  .r-readout .r{ color: var(--highlight); font-weight:800; }
+  .r-readout .n{ color: var(--orange); font-size: 13px; font-family: var(--body); font-weight: 800; }
+
+  .hint{
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    line-height:1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .hand, .cell, .toggle-btn, .arrow-btn{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ============================================================
+       LAYOUT: Number Chart on the left (compact); Congruence
+       Display and Remainder Clock stacked on the right, both
+       compact too, so all three cards fit on screen together.
+       ============================================================ -->
+  <div class="layout">
+
+    <!-- Component 1: Number Chart (fills the whole left column) -->
+    <div class="chart-section">
+      <section class="panel chart-panel">
+        <div class="panel-head">
+          <div class="panel-title">Number Chart</div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart" id="chart"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="side-stack">
+
+      <!-- Controls: n-slider + Integer/Decomposition toggle, moved here so the
+           Number Chart card can use the full height of the left column. -->
+      <div class="controls">
+        <div class="control-group">
+          <label for="nSlider">n</label>
+          <input type="range" id="nSlider" min="2" max="10" step="1" value="10" />
+          <span class="n-readout" id="nReadout">10</span>
+        </div>
+        <button class="toggle-btn" id="modeToggle" type="button">
+          Showing: <span class="flag" id="modeFlag">Integer</span>
+        </button>
+      </div>
+
+      <!-- Component 2: Congruence Display -->
+      <section class="panel hero-panel">
+        <div class="hero-inner">
+          <div class="cong-block">
+            <div class="member-squares" id="classMembers1"></div>
+            <div class="then-word">ALL:</div>
+            <div class="congruence">
+              <span class="rval" id="congR">1</span>
+              <span class="op">mod</span>
+              <span class="mod" id="congN">10</span>
+            </div>
+          </div>
+
+          <div class="cong-block">
+            <div class="member-squares" id="classMembers2"></div>
+            <div class="then-word">ALL:</div>
+            <div class="stmt-line" id="remLine"></div>
+          </div>
+
+          <div class="cong-block">
+            <div class="member-squares" id="classMembers3"></div>
+            <div class="then-word">ALL:</div>
+            <div class="stmt-line" id="multLine"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Component 3: Remainder Clock -->
+      <section class="panel clock-panel">
+        <div class="panel-head">
+          <div class="panel-title">Remainder Clock</div>
+        </div>
+
+        <div class="clock-stage" id="clockStage">
+          <div class="clock-face" id="clockFace"></div>
+          <div class="hand" id="hand"><div class="hand-shape"></div></div>
+          <div class="hub"></div>
+        </div>
+
+        <div class="clock-controls">
+          <button class="arrow-btn" id="rDown" type="button" aria-label="Decrease r">&#8249;</button>
+          <div class="r-readout"><span class="r" id="rReadoutVal">1</span><span class="n"> mod </span><span id="rReadoutN">10</span></div>
+          <button class="arrow-btn" id="rUp" type="button" aria-label="Increase r">&#8250;</button>
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     GLOBAL STATE
+     n = modulus (2-10), r = selected remainder (0..n-1),
+     mode = which label style the chart cells use.
+     Every visible feature reads from / writes to this object.
+     ========================================================= */
+  var state = { n: 10, r: 1, mode: 'standard' }; // mode: 'standard' | 'modular'
+
+  /* =========================================================
+     DOM REFERENCES
+     One lookup pass, reused by every render function below.
+     ========================================================= */
+  var el = {
+    nSlider: document.getElementById('nSlider'),
+    nReadout: document.getElementById('nReadout'),
+    modeToggle: document.getElementById('modeToggle'),
+    modeFlag: document.getElementById('modeFlag'),
+    chart: document.getElementById('chart'),
+    congR: document.getElementById('congR'),
+    congN: document.getElementById('congN'),
+    classMembers1: document.getElementById('classMembers1'),
+    classMembers2: document.getElementById('classMembers2'),
+    classMembers3: document.getElementById('classMembers3'),
+    remLine: document.getElementById('remLine'),
+    multLine: document.getElementById('multLine'),
+    clockStage: document.getElementById('clockStage'),
+    clockFace: document.getElementById('clockFace'),
+    hand: document.getElementById('hand'),
+    rDown: document.getElementById('rDown'),
+    rUp: document.getElementById('rUp'),
+    rReadoutVal: document.getElementById('rReadoutVal'),
+    rReadoutN: document.getElementById('rReadoutN')
+  };
+
+  /* ---- small math helpers ---- */
+  function mod(a, m){ return ((a % m) + m) % m; }
+
+  // Angle (degrees, clockwise from 12 o'clock) for tick/hand index i out of n ticks.
+  function angleForIndex(i, n){
+    return (360 / n) * i;
+  }
+
+  /* =========================================================
+     COMPONENT 1 — NUMBER CHART
+     buildChart(): full rebuild, called whenever n changes.
+     refreshChartLabelsAndHighlight(): cheap update, called
+       whenever r or the display mode changes (no rebuild needed).
+     ========================================================= */
+  function buildChart(){
+    var n = state.n;
+    // --n drives both the CSS grid-template-columns math and the clamp() font sizing.
+    el.chart.style.setProperty('--n', n);
+    el.chart.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
+    el.chart.style.gridTemplateRows = 'repeat(' + n + ', 1fr)';
+    el.chart.innerHTML = '';
+
+    // Row-major fill: row k (0-indexed) holds values k*n+1 .. k*n+n.
+    for (var k = 0; k < n; k++){
+      for (var c = 0; c < n; c++){
+        var value = k * n + (c + 1);
+        var cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.col = c;
+        cell.dataset.row = k;
+        cell.dataset.value = value;
+        el.chart.appendChild(cell);
+      }
+    }
+    refreshChartLabelsAndHighlight();
+    fitDecompFont();
+  }
+
+  function refreshChartLabelsAndHighlight(){
+    var n = state.n, r = state.r, mode = state.mode;
+    // Let CSS shrink the text in decomposition mode so "n(k) + c" fits.
+    el.chart.classList.toggle('modular', mode === 'modular');
+    var cells = el.chart.children;
+    for (var i = 0; i < cells.length; i++){
+      var cell = cells[i];
+      var c = parseInt(cell.dataset.col, 10);
+      var k = parseInt(cell.dataset.row, 10);
+      var value = parseInt(cell.dataset.value, 10);
+      var remOneIndexed = c + 1; // column position, 1..n -> always reconstructs `value` exactly
+
+      if (mode === 'standard'){
+        cell.textContent = value;
+      } else {
+        // Modular mode: display as single line "n(k) + c"
+        cell.textContent = n + '(' + k + ') + ' + remOneIndexed;
+      }
+
+      // Highlight whichever column actually holds the residue class matching r.
+      var residue = remOneIndexed % n; // 0..n-1
+      if (residue === r){
+        cell.classList.add('hl');
+      } else {
+        cell.classList.remove('hl');
+      }
+    }
+  }
+
+  /* Decomposition text ("n(k) + c") fits on a single line. Measure the widest
+     text and scale the font up to the largest value that still fits within the
+     cell. Never larger than the integer font size. Only affects modular mode
+     (sets a CSS var the .chart.modular .cell rule consumes; integer mode untouched). */
+  function fitDecompFont(){
+    var chart = el.chart, cells = chart.children;
+    if (state.mode !== 'modular' || !cells.length){
+      chart.style.removeProperty('--decomp-fs');
+      return;
+    }
+    var n = state.n;
+
+    // Calculate the integer font size (clamp(1.25rem, 4.2rem/n, 2.2rem))
+    // 1rem = 16px, so: clamp(20px, 67.2px/n, 35.2px)
+    var integerFsMin = 20;
+    var integerFsMax = 35.2;
+    var integerFsMid = 67.2 / n;
+    var integerFs = Math.min(Math.max(integerFsMid, integerFsMin), integerFsMax);
+
+    var cs = getComputedStyle(cells[0]);
+    // Single-line text is widest at the largest n. Measure intrinsic width
+    // OUTSIDE the flex/overflow cell (where scrollWidth is unreliable) at a
+    // 100px reference size.
+    var REF = 100;
+    var textSample = n + '(' + (n - 1) + ') + ' + n;
+    var meas = document.createElement('span');
+    meas.textContent = textSample;
+    meas.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden;'
+      + 'white-space:nowrap;letter-spacing:-0.01em;font-weight:700;'
+      + 'font-family:' + cs.fontFamily + ';font-size:' + REF + 'px;';
+    document.body.appendChild(meas);
+    var wRef = meas.getBoundingClientRect().width;
+    document.body.removeChild(meas);
+
+    // Fit to cell width (primary) and height (secondary). Cap at integer font size.
+    var innerW = cells[0].clientWidth - 8;
+    var innerH = cells[0].clientHeight - 6;
+    var byWidth = REF * (innerW / wRef);
+    var byHeight = innerH * 0.9; // Generous height margin for ascenders/descenders
+    var fsPx = Math.min(byWidth, byHeight, integerFs);
+    fsPx = Math.max(fsPx, 9);
+    chart.style.setProperty('--decomp-fs', fsPx.toFixed(2) + 'px');
+  }
+
+  /* =========================================================
+     COMPONENT 2 — CONGRUENCE DISPLAY
+     Pure render function, no state of its own: always driven
+     by the shared n / r. Note: r (.rval) is colored via
+     --highlight to match the chart's highlighted column; n
+     (.mod) stays neutral ink on purpose.
+     ========================================================= */
+  function refreshCongruence(){
+    var n = state.n, r = state.r;
+    el.congR.textContent = r;
+    el.congN.textContent = n;
+
+    // Exactly n members — one per chart row — so this list is always the
+    // same set of numbers as the chart's highlighted column. Column value
+    // in row k is (remOneIndexed + k*n), where remOneIndexed is r itself
+    // (or n, when r is 0, since a value of n has residue 0 mod n).
+    var remOneIndexed = r === 0 ? n : r;
+    var squaresHtml = '';
+    for (var k = 0; k < n; k++){
+      squaresHtml += '<span class="msq">' + (remOneIndexed + k * n) + '</span>';
+    }
+    // Same list of numbers repeated for all three sections of the card.
+    el.classMembers1.innerHTML = squaresHtml;
+    el.classMembers2.innerHTML = squaresHtml;
+    el.classMembers3.innerHTML = squaresHtml;
+
+    // Plain-language readouts with the *actual* live r and n values.
+    // "Have remainder" and r are pink like r; "when divided by" is orange like "mod".
+    el.remLine.innerHTML = '<span class="pink-word">Have remainder</span> <span class="pink-word">' + r +
+      '</span> <span class="orange-word">when divided by</span> ' + n;
+    // r and "above" are pink like r; "a multiple of" is orange like "mod"; n stays black.
+    el.multLine.innerHTML = '<span class="pink-word">' + r +
+      '</span> <span class="pink-word">above</span> <span class="orange-word">a multiple of</span> ' + n;
+  }
+
+  /* =========================================================
+     COMPONENT 3 — REMAINDER CLOCK
+     buildClockTicks(): rebuilds tick marks + labels, called
+       whenever n changes.
+     setHandAngle()/syncHandToR(): move the hand, with or
+       without a CSS transition.
+     Drag handling: pointerdown/move/up on the hand.
+     Arrow buttons: instant +/-1 step with wraparound.
+     ========================================================= */
+  function buildClockTicks(){
+    var n = state.n;
+    var stage = el.clockStage;
+    var old = stage.querySelectorAll('.tick, .tick-label');
+    old.forEach(function(node){ node.remove(); });
+
+    for (var i = 0; i < n; i++){
+      var deg = angleForIndex(i, n);
+
+      // Tick line: bottom-anchored at dial center, rotated out to its position.
+      var tick = document.createElement('div');
+      tick.className = 'tick major';
+      tick.style.transform = 'translate(-50%, -100%) rotate(' + deg + 'deg)';
+      stage.appendChild(tick);
+
+      // Tick label: placed by trig so it sits just outside the dial ring.
+      // rad shifts by -90deg because 0deg in our convention = "up", but
+      // standard atan2/cos/sin trig treats 0deg = "right".
+      var rad = (deg - 90) * Math.PI / 180;
+      var label = document.createElement('div');
+      label.className = 'tick-label';
+      label.dataset.index = i;
+      label.textContent = i;
+      var xPct = 50 + 40 * Math.cos(rad);
+      var yPct = 50 + 40 * Math.sin(rad);
+      label.style.left = xPct + '%';
+      label.style.top = yPct + '%';
+      label.style.transform = 'translate(-50%, -50%)';
+      stage.appendChild(label);
+    }
+    refreshClockLabelsActive();
+  }
+
+  function refreshClockLabelsActive(){
+    var labels = el.clockStage.querySelectorAll('.tick-label');
+    labels.forEach(function(l){
+      var idx = parseInt(l.dataset.index, 10);
+      if (idx === state.r) l.classList.add('active');
+      else l.classList.remove('active');
+    });
+  }
+
+  // Rotate the hand. animate=true -> smooth snap (drag release);
+  // animate=false -> instant jump (arrow buttons, n changes).
+  function setHandAngle(deg, animate){
+    el.hand.style.transition = animate
+      ? 'transform 0.28s cubic-bezier(.2,.8,.2,1)'
+      : 'none';
+    // Same bottom-anchored convention as .tick, so 0deg = straight up = index 0.
+    el.hand.style.transform = 'translate(-50%, -100%) rotate(' + deg + 'deg)';
+  }
+
+  function syncHandToR(animate){
+    setHandAngle(angleForIndex(state.r, state.n), animate);
+  }
+
+  /* ---- Drag interaction: click-and-drag the hand, snap on release ---- */
+  var dragging = false;
+
+  // Pointer position -> angle in degrees, 0deg = "up", clockwise-positive.
+  function angleFromPointer(clientX, clientY){
+    var rect = el.clockStage.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    var dx = clientX - cx;
+    var dy = clientY - cy;
+    var deg = Math.atan2(dy, dx) * 180 / Math.PI + 90; // shift so 0deg = top
+    return mod(deg, 360);
+  }
+
+  function onPointerDown(e){
+    dragging = true;
+    el.hand.classList.add('grabbing');
+    el.hand.setPointerCapture && el.hand.setPointerCapture(e.pointerId);
+    onPointerMove(e); // snap the hand under the cursor immediately on grab
+    e.preventDefault();
+  }
+
+  function onPointerMove(e){
+    if (!dragging) return;
+    // Continuous, un-transitioned follow of the cursor while dragging.
+    var deg = angleFromPointer(e.clientX, e.clientY);
+    setHandAngle(deg, false);
+  }
+
+  function onPointerUp(e){
+    if (!dragging) return;
+    dragging = false;
+    el.hand.classList.remove('grabbing');
+    var deg = angleFromPointer(e.clientX, e.clientY);
+    var step = 360 / state.n;
+    var nearest = mod(Math.round(deg / step), state.n);
+    state.r = nearest;
+    syncHandToR(true); // animated snap to the nearest tick
+    onRChanged();
+  }
+
+  el.hand.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
+
+  /* ---- Arrow buttons: instant +/-1 step, no animation, with wraparound ---- */
+  el.rDown.addEventListener('click', function(){
+    state.r = mod(state.r - 1, state.n);
+    syncHandToR(false);
+    onRChanged();
+  });
+  el.rUp.addEventListener('click', function(){
+    state.r = mod(state.r + 1, state.n);
+    syncHandToR(false);
+    onRChanged();
+  });
+
+  /* =========================================================
+     CROSS-COMPONENT WIRING
+     Any change to r or n funnels through here so all three
+     components stay in sync.
+     ========================================================= */
+  function onRChanged(){
+    el.rReadoutVal.textContent = state.r;
+    el.rReadoutN.textContent = state.n;
+    refreshClockLabelsActive();
+    refreshChartLabelsAndHighlight();
+    refreshCongruence();
+  }
+
+  function onNChanged(){
+    state.n = parseInt(el.nSlider.value, 10);
+    // Clamp r into the new valid range whenever n shrinks.
+    if (state.r > state.n - 1) state.r = state.n - 1;
+
+    el.nReadout.textContent = state.n;
+    buildChart();
+    buildClockTicks();
+    syncHandToR(false); // instant re-position, no drag/animation implied by an n change
+    el.rReadoutVal.textContent = state.r;
+    el.rReadoutN.textContent = state.n;
+    refreshCongruence();
+  }
+
+  el.nSlider.addEventListener('input', onNChanged);
+
+  el.modeToggle.addEventListener('click', function(){
+    state.mode = state.mode === 'standard' ? 'modular' : 'standard';
+    el.modeFlag.textContent = state.mode === 'standard' ? 'Integer' : 'Decomposition';
+    refreshChartLabelsAndHighlight();
+    fitDecompFont();
+  });
+
+  /* =========================================================
+     INITIAL RENDER
+     ========================================================= */
+  el.nSlider.value = state.n;
+  el.nReadout.textContent = state.n;
+  buildChart();
+  buildClockTicks();
+  syncHandToR(false);
+  el.rReadoutVal.textContent = state.r;
+  el.rReadoutN.textContent = state.n;
+  refreshCongruence();
+
+  // Re-fit the decomposition font whenever the grid is resized.
+  window.addEventListener('resize', fitDecompFont);
+
+})();
+</script>
+
+</body>
+</html>
