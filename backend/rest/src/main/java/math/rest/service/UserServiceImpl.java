@@ -3,6 +3,7 @@ package math.rest.service;
 import lombok.AllArgsConstructor;
 import math.rest.entity.User;
 import math.rest.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +33,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User form) {
-        return null;
+    public User save(User user) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String result = encoder.encode(user.getPassword());
+        user.setPassword(result);
+        return userRepository.save(user);
     }
 
     @Override

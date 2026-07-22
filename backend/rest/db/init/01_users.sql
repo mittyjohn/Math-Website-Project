@@ -10,6 +10,18 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (username, email, password)
-SELECT 'jojo', 'jojo@gmail.com', '{noop}password'
+    SELECT 'jojo', 'jojo@email.com', '$2a$10$GkWhc4khicSH29hxiccyaeALr4cE278H7fij8AVUsNz/5IRsr4G4m'
     WHERE NOT EXISTS (SELECT * FROM users WHERE ID=1);
+
+INSERT INTO users (username, email, password)
+    SELECT 'nelly', 'nelly@email.com', '$2a$10$GkWhc4khicSH29hxiccyaeALr4cE278H7fij8AVUsNz/5IRsr4G4m'
+    WHERE NOT EXISTS (SELECT * FROM users WHERE ID=2);
+
+INSERT INTO users (username, email, password)
+    SELECT 'tom', 'tom@email.com', '$2a$10$GkWhc4khicSH29hxiccyaeALr4cE278H7fij8AVUsNz/5IRsr4G4m'
+    WHERE NOT EXISTS (SELECT * FROM users WHERE ID=3);
+
+INSERT INTO users (username, email, password)
+    SELECT 'max', 'max@email.com', '$2a$10$GkWhc4khicSH29hxiccyaeALr4cE278H7fij8AVUsNz/5IRsr4G4m'
+    WHERE NOT EXISTS (SELECT * FROM users WHERE ID=4);
 
