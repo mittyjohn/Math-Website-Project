@@ -9,6 +9,11 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
     hikari:
       connectionTimeout: 20000
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:db/schema.sql
+#      data-locations: classpath:db/data.sql
   jpa:
     hibernate:
       ddl-auto: none

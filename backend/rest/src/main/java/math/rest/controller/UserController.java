@@ -23,14 +23,14 @@ public class UserController {
         return userService.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public User findUserById(
         @PathVariable Long id
     ) {
         return userService.findById(id);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/usr/{username}")
     public User findUserByUsername(
         @PathVariable String username
     ) {

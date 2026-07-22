@@ -14,6 +14,7 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
