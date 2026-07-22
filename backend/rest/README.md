@@ -10,6 +10,11 @@ docker compose up --build
 ```
 > **Note:**  The build process may take some time on the first run
 
+Remove containers/volumes if you're having issues:
+```
+docker compose down -v
+```
+
 Build:
 ```
 docker compose bulid

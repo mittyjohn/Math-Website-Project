@@ -1,0 +1,40 @@
+package math.rest.controller;
+
+import lombok.AllArgsConstructor;
+import math.rest.entity.User;
+import math.rest.service.UserService;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@AllArgsConstructor
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    @GetMapping("/all")
+    public List<User> allUsers(Model model) {
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User findUserById(
+        @PathVariable Long id
+    ) {
+        return userService.findById(id);
+    }
+
+    @GetMapping("/{username}")
+    public User findUserByUsername(
+        @PathVariable String username
+    ) {
+        return userService.findByUsername(username);
+    }
+
+}
