@@ -34,9 +34,9 @@ public class User {
 
     private String email;
 
-    private int level;
+    private int level = 0;
 
-    private int streak;
+    private int streak = 0;
 
     @Override
     public boolean equals(Object o) {

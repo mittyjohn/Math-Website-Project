@@ -12,7 +12,9 @@ public interface UserService {
 
     User findByUsername(String username);
 
-    User save(User form);
+    User create(User form);
 
-    User delete(Long id);
+    User update(User form);
+
+    void delete(String username);
 }
