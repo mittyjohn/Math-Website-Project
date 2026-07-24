@@ -1,6 +1,7 @@
 package math.rest.controller;
 
 import lombok.AllArgsConstructor;
+import math.rest.dto.LoginDTO;
 import math.rest.entity.User;
 import math.rest.service.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +54,11 @@ public class UserController {
     @DeleteMapping("/del/{username}")
     void delete(@PathVariable String username) {
         userService.delete(username);
+    }
+
+    @GetMapping("/login")
+    void login(@RequestBody LoginDTO user) {
+        userService.login(user);
     }
 
 }
