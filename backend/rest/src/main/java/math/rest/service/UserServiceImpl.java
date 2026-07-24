@@ -1,7 +1,9 @@
 package math.rest.service;
 
 import lombok.AllArgsConstructor;
+import math.rest.dto.LoginDTO;
 import math.rest.entity.User;
+import math.rest.exception.InvalidLoginException;
 import math.rest.exception.ResourceNotFoundException;
 import math.rest.exception.UsernameNotFound;
 import math.rest.repository.UserRepository;
@@ -68,6 +70,15 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(userPending);
     }
 
-
+    public boolean login(LoginDTO user) {
+        User userDB = userRepository
+            .findByUsername(user.username())
+            .orElseThrow(InvalidLoginException::new);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(user.password(), userDB.getPassword())) {
+            return true;
+        }
+        throw new InvalidLoginException();
+    }
 
 }

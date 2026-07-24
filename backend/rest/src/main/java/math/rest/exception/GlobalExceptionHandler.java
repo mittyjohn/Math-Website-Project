@@ -27,6 +27,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidLogin(InvalidLoginException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of("error", ex.getMessage()));
+    }
+
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
