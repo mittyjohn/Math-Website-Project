@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Welcome to Hercules Math!",
+    title: "MO Delta Phi",
   description: "Build in HYS",
 };
 

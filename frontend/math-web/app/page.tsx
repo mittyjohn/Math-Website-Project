@@ -7,12 +7,12 @@ export default function Home() {
           <main className="bg-white text-black">
               <div className="flex justify-center items-center pt-4">
                   <aside className="flex items-center gap-6 text-center sm:items-start sm:text-right">
-                      <img src="/logo.png" alt="Hercules Logo" className="w-20 h-20 mr-4" />
-                      <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#home">Hercules Math</a>  </ul>
+                      <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
+                      <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#home">MO Delta Phi</a>  </ul>
                       <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#learn">Learn</a>  </ul>
                       <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#about">About Us</a>  </ul>
                       <ul className="pt-8 text-2xl"><QuoteDisplay /></ul>
-                      <img src="/logo.png" alt="Hercules Logo" className="w-20 h-20 mr-4" />
+                      <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
                   </aside>
               </div>
               <aside className="flex justify-center items-center gap-6 text-center sm:items-start sm:text-center pt-12">
