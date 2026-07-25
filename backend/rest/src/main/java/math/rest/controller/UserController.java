@@ -4,20 +4,25 @@ import lombok.AllArgsConstructor;
 import math.rest.dto.LoginDTO;
 import math.rest.entity.User;
 import math.rest.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -27,13 +32,6 @@ public class UserController {
         return userService.findAll();
     }
 
-    @GetMapping("/id/{id}")
-    public User findUserById(
-        @PathVariable Long id
-    ) {
-        return userService.findById(id);
-    }
-
     @GetMapping("/usr/{username}")
     public User findUserByUsername(
         @PathVariable String username
@@ -41,13 +39,13 @@ public class UserController {
         return userService.findByUsername(username);
     }
 
-    @PostMapping("/add")
-    User create(@RequestBody User user) {
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    User create(User user) {
         return userService.create(user);
     }
 
-    @PutMapping("/update")
-    User update(@RequestBody User user) {
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    User update(User user) {
         return userService.update(user);
     }
 
@@ -56,9 +54,10 @@ public class UserController {
         userService.delete(username);
     }
 
-    @GetMapping("/login")
-    void login(@RequestBody LoginDTO user) {
+    @PostMapping(value = "/login", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<Map<String, String>> login(LoginDTO user) {
         userService.login(user);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(Map.of("username", user.username()));
     }
-
 }

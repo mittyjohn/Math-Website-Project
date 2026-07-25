@@ -1,7 +1,20 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import './globals.css';
 import QuoteDisplay from './QuoteDisplay';
+import { getLogname, logoutUser } from './login/login';
+
 export default function Home() {
+  const [logname, setLogname] = useState<any>(null);
+  useEffect(() => {
+    getLogname().then((result) => {
+        setLogname(result);
+      })
+      .catch(() => {
+        setLogname(null);
+      });
+  }, []);
   return (
     <div>
       <main>
@@ -10,7 +23,16 @@ export default function Home() {
                       <ul> <a className="hover:text-blue-700"href="#home">Home</a>  </ul>
                       <ul> <a className="hover:text-blue-700" href="#learn">Learn</a>  </ul>
                       <ul> <a className="hover:text-blue-700" href="#about">About Us</a>  </ul>
+                      {!logname  || !logname.value ? (
+                        <ul> <a className="hover:text-blue-700" href="/login">Login</a>  </ul>
+                        ) : (
+                            <ul> <a className="hover:text-blue-700" href="/profile">{logname.value}</a>  </ul>
+                        )}
+                        { logname && logname.value ? 
+                        (<ul> <a className="hover:text-blue-700" href="/" onClick={() => logoutUser()}>Logout</a>  </ul>) : null}
                   </aside>
+              </div>
+              <div>
               </div>
               <h1 className=" flex justify-center items-center pt-4 text-8xl">
                   Hercules Math
