@@ -1,6 +1,8 @@
 import React from 'react';
 import './globals.css';
 import QuoteDisplay from './QuoteDisplay';
+import QuizGenerator from './QuizGenerator';
+
 export default function Home() {
   return (
     <div>
