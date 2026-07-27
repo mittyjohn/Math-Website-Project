@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "MO Delta Phi",
+    title: "MO Delta Psi",
   description: "Build in HYS",
 };
 
