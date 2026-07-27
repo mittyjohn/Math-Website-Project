@@ -1,17 +1,37 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import './globals.css';
 import QuoteDisplay from './QuoteDisplay';
+import { getLogname, logoutUser } from './login/login';
+
 export default function Home() {
+  const [logname, setLogname] = useState<any>(null);
+  useEffect(() => {
+    getLogname().then((result) => {
+        setLogname(result?.value);
+      })
+      .catch(() => {
+        setLogname(null);
+      });
+  }, []);
   return (
       <div>
           <main className="bg-white text-black">
               <div className="flex justify-center items-center pt-4">
                   <aside className="flex items-center gap-6 text-center sm:items-start sm:text-right">
                       <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
-                      <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#home">MO Delta Phi</a>  </ul>
-                      <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#learn">Learn</a>  </ul>
-                      <ul className="pt-8 text-2xl"> <a className="hover:text-blue-700" href="#about">About Us</a>  </ul>
-                      <ul className="pt-8 text-2xl"><QuoteDisplay /></ul>
+                      <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="#home">MO Delta Phi</a>  </ul>
+                      <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="#learn">Learn</a>  </ul>
+                      <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="#about">About Us</a>  </ul>
+                      <ul className="pt-8 text-xl"><QuoteDisplay /></ul>
+                      {!logname ? (
+                        <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/login">Login</a>  </ul>
+                        ) : (
+                            <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/profile">{logname}</a>  </ul>
+                        )}
+                        { logname ?
+                        (<ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/" onClick={() => logoutUser()}>Logout</a>  </ul>) : null}
                       <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
                   </aside>
               </div>

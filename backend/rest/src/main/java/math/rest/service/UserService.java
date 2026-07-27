@@ -19,5 +19,5 @@ public interface UserService {
 
     void delete(String username);
 
-    boolean login(LoginDTO form);
+    User login(LoginDTO form);
 }
