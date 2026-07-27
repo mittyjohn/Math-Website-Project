@@ -9,7 +9,7 @@ export default function Home() {
   const [logname, setLogname] = useState<any>(null);
   useEffect(() => {
     getLogname().then((result) => {
-        setLogname(result);
+        setLogname(result?.value);
       })
       .catch(() => {
         setLogname(null);
@@ -25,13 +25,14 @@ export default function Home() {
                       <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="#learn">Learn</a>  </ul>
                       <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="#about">About Us</a>  </ul>
                       <ul className="pt-8 text-xl"><QuoteDisplay /></ul>
-                      {!logname  || !logname.value ? (
+                      {!logname ? (
                         <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/login">Login</a>  </ul>
                         ) : (
-                            <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/profile">{logname.value}</a>  </ul>
+                            <ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/profile">{logname}</a>  </ul>
                         )}
-                        { logname && logname.value ?
+                        { logname ?
                         (<ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/" onClick={() => logoutUser()}>Logout</a>  </ul>) : null}
+                      <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
                   </aside>
               </div>
               <aside className="flex justify-center items-center gap-6 text-center sm:items-start sm:text-center pt-12">
