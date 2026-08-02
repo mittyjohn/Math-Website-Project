@@ -2,18 +2,20 @@ package math.rest.service;
 
 import lombok.AllArgsConstructor;
 import math.rest.dto.LoginDTO;
+import math.rest.dto.UserDTO;
 import math.rest.entity.User;
 import math.rest.exception.InvalidLoginException;
 import math.rest.exception.ResourceNotFoundException;
 import math.rest.exception.UsernameNotFoundException;
+import math.rest.exception.DuplicateUsernameException;
+import math.rest.mapper.UserMapper;
 import math.rest.repository.UserRepository;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -21,6 +23,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private final UserMapper mapper;
 
     @Override
     public List<User> findAll() {
@@ -42,27 +46,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String result = encoder.encode(user.getPassword());
+    public User create(UserDTO user) {
+        String result = passwordEncoder.encode(user.getPassword());
         user.setPassword(result);
-        return userRepository.save(user);
+        User entity = mapper.toEntity(user);
+        return userRepository.save(entity);
     }
 
     @Override
-    public User update(User user) {
-        // TODO: use transactional?? maybe, only update fields that r not null in given user obj
-        User userPending = userRepository
-            .findByUsername(user.getUsername())
-            .orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            String result = passwordEncoder.encode(user.getPassword());
-            user.setPassword(result);
-        } else {
-            user.setPassword(userPending.getPassword());
+    public User update(UserDTO dto) {
+        User entity = userRepository
+            .findByUsername(dto.getUsername())
+            .orElseThrow(() -> new UsernameNotFoundException(dto.getUsername()));
+        mapper.updateEntityFromDto(dto, entity);
+         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            String result = passwordEncoder.encode(dto.getPassword());
+            entity.setPassword(result);
         }
-        user.setId(userPending.getId());
-        return userRepository.save(user);
+        return userRepository.save(entity);
     }
 
     @Override

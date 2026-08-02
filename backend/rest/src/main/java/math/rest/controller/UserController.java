@@ -1,6 +1,7 @@
 package math.rest.controller;
 
 import lombok.AllArgsConstructor;
+import math.rest.dto.UserDTO;
 import math.rest.dto.LoginDTO;
 import math.rest.entity.User;
 import math.rest.service.UserService;
@@ -40,12 +41,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User create(User user) {
+    User create(UserDTO user) {
         return userService.create(user);
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User update(User user) {
+    User update(UserDTO user) {
         return userService.update(user);
     }
 
