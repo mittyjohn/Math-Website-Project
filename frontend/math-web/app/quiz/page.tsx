@@ -1,5 +1,5 @@
-import QuizPage from '../QuizPage';
+import QuizGenerator from '../QuizGenerator';
 
 export default function QuizRoutePage() {
-  return <QuizPage />;
+  return <QuizGenerator />;
 }

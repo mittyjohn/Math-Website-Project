@@ -150,10 +150,10 @@ export default function QuizGenerator() {
   }
 
   return (
-    <section className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="w-full max-w-4xl rounded-2xl border border-black bg-black p-6 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-3xl font-bold text-slate-800">Modular Arithmetic Quiz Generator</h2>
-        <p className="mt-2 text-slate-600">
+        <h2 className="text-3xl font-bold text-white">Modular Arithmetic Quiz Generator</h2>
+        <p className="mt-2 text-slate-200">
           Pick a difficulty, choose how many questions you want, and answer each one. You get up to 3 tries before the solution is revealed.
         </p>
       </div>
@@ -178,7 +178,7 @@ export default function QuizGenerator() {
           </div>
 
           <div className="flex flex-col items-center gap-2">
-            <label htmlFor="numQuestions" className="text-lg font-medium text-slate-700">
+            <label htmlFor="numQuestions" className="text-lg font-medium text-slate-400">
               Number of Questions
             </label>
             <input
@@ -192,7 +192,7 @@ export default function QuizGenerator() {
             />
           </div>
 
-          <label className="flex items-center justify-center gap-2 text-sm font-medium text-slate-700">
+          <label className="flex items-center justify-center gap-2 text-sm font-medium text-slate-300">
             <input
               type="checkbox"
               checked={randomizeOrder}
@@ -218,7 +218,7 @@ export default function QuizGenerator() {
           <div className="text-sm font-medium uppercase tracking-wide text-slate-500">
             {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} • Question {currentIndex + 1} of {questions.length}
           </div>
-          <h3 className="text-2xl font-semibold text-slate-800">{currentQuestion.question}</h3>
+          <h3 className="text-2xl font-semibold text-white">{currentQuestion.question}</h3>
 
           <input
             type="text"
@@ -246,7 +246,7 @@ export default function QuizGenerator() {
             </button>
           </div>
 
-          {feedback && <p className="text-sm text-slate-700">{feedback}</p>}
+          {feedback && <p className="text-sm text-slate-300">{feedback}</p>}
 
           {showSolution && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
