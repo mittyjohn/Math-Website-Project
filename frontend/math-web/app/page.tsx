@@ -1,9 +1,7 @@
-"use client";
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
 import './globals.css';
 import QuoteDisplay from './QuoteDisplay';
-import { getLogname, logoutUser } from './login/login';
 
 export default function Home() {
   const [logname, setLogname] = useState<any>(null);
@@ -34,6 +32,12 @@ export default function Home() {
                         (<ul className="pt-8 text-xl"> <a className="hover:text-blue-700" href="/" onClick={() => logoutUser()}>Logout</a>  </ul>) : null}
                       <img src="/logo.png" alt="MO Delta Phi Logo" className="w-20 h-20 mr-4" />
                   </aside>
+              </div>
+              <h1 className=" flex justify-center items-center pt-4 text-8xl">
+                  MODeltaPsi
+              </h1>
+              <div className="flex justify-center items-center gap-6 text-center sm:items-start sm:text-left pt-4">
+                  <QuoteDisplay />
               </div>
               <aside className="flex justify-center items-center gap-6 text-center sm:items-start sm:text-center pt-12">
                   <div>
