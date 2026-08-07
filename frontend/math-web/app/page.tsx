@@ -15,7 +15,7 @@ export default function Home() {
                   </aside>
               </div>
               <h1 className=" flex justify-center items-center pt-4 text-8xl">
-                  Hercules Math
+                  MODeltaPsi
               </h1>
               <div className="flex justify-center items-center gap-6 text-center sm:items-start sm:text-left pt-4">
                   <QuoteDisplay />
