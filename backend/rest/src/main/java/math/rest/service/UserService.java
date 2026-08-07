@@ -1,5 +1,6 @@
 package math.rest.service;
 
+import math.rest.dto.LoginDTO;
 import math.rest.entity.User;
 
 import java.util.List;
@@ -12,7 +13,11 @@ public interface UserService {
 
     User findByUsername(String username);
 
-    User save(User form);
+    User create(User form);
 
-    User delete(Long id);
+    User update(User form);
+
+    void delete(String username);
+
+    User login(LoginDTO form);
 }

@@ -6,9 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,9 +32,9 @@ public class User {
 
     private String email;
 
-    private int level;
+    private int level = 0;
 
-    private int streak;
+    private int streak = 0;
 
     @Override
     public boolean equals(Object o) {

@@ -52,3 +52,4 @@ Go to http://localhost:8080/greeting. You should see the following:
 
 Used Spring Guide to setup: https://spring.io/guides/gs/rest-service
 Docker Setup with Java: https://docs.docker.com/guides/java/
+Build Rest API with Spring Boot: https://medium.com/@kariapratham/building-a-restful-api-with-spring-boot-93f7d9655bce
