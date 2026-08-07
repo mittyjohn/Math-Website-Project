@@ -1,7 +1,7 @@
 import React from 'react';
+import Link from 'next/link';
 import './globals.css';
 import QuoteDisplay from './QuoteDisplay';
-import QuizGenerator from './QuizGenerator';
 
 export default function Home() {
   return (
@@ -32,7 +32,7 @@ export default function Home() {
                   <div>
                       <h2 className="text-2xl font-bold hover:text-blue-700"><a href="#mid">Middle School</a></h2>
                       <ul>Algebra</ul>
-                      <a className="text-blue-700 hover:text-white" href="#number-theory">Number Theory</a>
+                      <Link className="text-blue-700 hover:text-white" href="/number-theory">Number Theory</Link>
                       <ul>Geometry</ul>
                       <ul>Combinatorics</ul>
                       <ul>Probability</ul>
