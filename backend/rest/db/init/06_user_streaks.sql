@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS streaks (
                ON DELETE CASCADE,
            FOREIGN KEY(streak_id)
                REFERENCES streaks(id)
-               ON DELETE CASCADE
+               ON DELETE CASCADE,
+           UNIQUE (user_id, streak_id)
 );
 
 INSERT INTO streaks (user_id, streak_id, count)
