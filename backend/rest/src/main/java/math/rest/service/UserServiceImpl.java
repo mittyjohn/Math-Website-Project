@@ -7,7 +7,6 @@ import math.rest.entity.User;
 import math.rest.exception.InvalidLoginException;
 import math.rest.exception.ResourceNotFoundException;
 import math.rest.exception.UsernameNotFoundException;
-import math.rest.exception.DuplicateUsernameException;
 import math.rest.mapper.UserMapper;
 import math.rest.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 @Service

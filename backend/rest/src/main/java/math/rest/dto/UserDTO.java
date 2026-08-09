@@ -23,10 +23,4 @@ public class UserDTO {
     @Email
     private String email;
 
-    @NotNull
-    private int level = 0;
-
-    @NotNull
-    private int streak = 0;
-
 }

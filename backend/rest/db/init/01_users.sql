@@ -4,9 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
                                      username  VARCHAR(25) NOT NULL,
                                      email     VARCHAR(50) NOT NULL,
                                      password  VARCHAR(256) NOT NULL,
-                                     level     INT DEFAULT 0 NOT NULL,
-                                     streak  INT DEFAULT 0 NOT NULL,
-                                     UNIQUE (username)
+                                     UNIQUE (username, email)
 );
 
 INSERT INTO users (username, email, password)
