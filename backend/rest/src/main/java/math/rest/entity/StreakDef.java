@@ -1,6 +1,5 @@
 package math.rest.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,24 +17,20 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "streak_defs")
+public class StreakDef {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
-    @Column(unique = true)
-    private String username;
+    private String name;
 
-    private String password;
-
-    @Column(unique = true)
-    private String email;
+    private String freq;
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof User that)) return false;
+        if (!(o instanceof StreakDef that)) return false;
         return Objects.equals(id, that.id);
     }
 

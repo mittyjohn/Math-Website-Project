@@ -1,10 +1,8 @@
 package math.rest.controller;
 
 import lombok.AllArgsConstructor;
-import math.rest.dto.UserDTO;
-import math.rest.dto.LoginDTO;
-import math.rest.entity.User;
-import math.rest.service.UserService;
+import math.rest.entity.StreakDef;
+import math.rest.service.StreakDefService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,43 +20,37 @@ import java.util.Map;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/streakDefs")
 @CrossOrigin(origins = "http://localhost:3000")
-public class UserController {
+public class StreakDefController {
 
-    private final UserService userService;
+    private final StreakDefService streakDefService;
 
     @GetMapping("/all")
-    public List<User> allUsers() {
-        return userService.findAll();
+    public List<StreakDef> allStreakDefs() {
+        return streakDefService.findAll();
     }
 
-    @GetMapping("/usr/{username}")
-    public User findUserByUsername(
-        @PathVariable String username
+    @GetMapping("/id/{id}")
+    public StreakDef findStreakDefById(
+        @PathVariable Long id
     ) {
-        return userService.findByUsername(username);
+        return streakDefService.findById(id);
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User create(UserDTO user) {
-        return userService.create(user);
+    StreakDef create(StreakDef streakDef) {
+        return streakDefService.create(streakDef);
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User update(UserDTO user) {
-        return userService.update(user);
+    StreakDef update(StreakDef streakDef) {
+        return streakDefService.update(streakDef);
     }
 
-    @DeleteMapping("/del/{username}")
-    void delete(@PathVariable String username) {
-        userService.delete(username);
+    @DeleteMapping("/del/{id}")
+    void delete(@PathVariable Long id) {
+        streakDefService.delete(id);
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Map<String, String>> login(LoginDTO user) {
-        userService.login(user);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(Map.of("username", user.username()));
-    }
 }

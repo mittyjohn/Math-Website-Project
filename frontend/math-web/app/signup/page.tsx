@@ -1,24 +1,20 @@
 "use client"
 
 import { SubmitEvent } from 'react';
-import { loginUser } from './login';
+import signup from './signup';
 import '../form.css';
-
-/* Refs: 
-    - Forms: https://nextjs.org/docs/pages/guides/forms
-*/
 
 export default function page() {
   
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    await loginUser(formData);
+    await signup(formData);
   }
  
   return (
     <div className="container text-center">
-        <h1>Login</h1>
+        <h1>Sign Up</h1>
 
         <form onSubmit={onSubmit}>
           <div className="mb-3">
@@ -29,10 +25,13 @@ export default function page() {
             <label htmlFor="passInput" className="form-label">Password</label>
             <input type="password" className="form-control" id="passInput" name="password" required/>
           </div>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">Email</label>
+            <input type="email" className="form-control" id="passInput" name="email" required/>
+          </div>
           <button type="submit" className="btn btn-primary">Submit</button>
 
         </form>
-        <a href="/signup" className="btn btn-link">Sign Up</a>
     </div>
   )
 }
