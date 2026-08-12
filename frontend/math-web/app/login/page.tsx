@@ -1,6 +1,6 @@
 "use client"
 
-import { SubmitEvent } from 'react';
+import { SubmitEvent, useState } from 'react';
 import { loginUser } from './login';
 import '../form.css';
 
@@ -9,17 +9,23 @@ import '../form.css';
 */
 
 export default function page() {
+
+  const [error, setError] = useState<string>('');
   
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    await loginUser(formData);
+    const success = await loginUser(formData);
+    if (!success) {
+      setError('Invalid username or password.')
+    }
   }
- 
-  return (
-    <div className="container text-center">
-        <h1>Login</h1>
 
+  return (
+    <div className="text-center ml-auto mr-auto">
+        <h1>Login</h1>
+        {error.length > 0 ?  <div className="alert alert-danger" role="alert">{error}</div> : null}
+        
         <form onSubmit={onSubmit}>
           <div className="mb-3">
             <label htmlFor="usernameInput" className="form-label">Username</label>

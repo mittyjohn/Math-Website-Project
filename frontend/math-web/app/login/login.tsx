@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
     - Forms: https://nextjs.org/docs/pages/guides/forms
 */
 
-export async function loginUser(formData: FormData) {
+export async function loginUser(formData: FormData): Promise<boolean> {
     let rdr_path: string | null = null;
     try {
         const response = await fetch('http://localhost:8080/users/login', {
@@ -33,10 +33,12 @@ export async function loginUser(formData: FormData) {
 
     } catch (error) {
         console.error(error)
+        return false;
     }
     if (rdr_path) {
         redirect(rdr_path);
     }
+    return true;
 }
 
 export async function logoutUser() {
