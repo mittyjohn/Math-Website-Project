@@ -30,6 +30,8 @@ public class Question {
 
     private String description;
 
+    private String answer;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Question that)) return false;

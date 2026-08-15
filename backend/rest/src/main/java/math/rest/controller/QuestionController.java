@@ -46,7 +46,7 @@ public class QuestionController {
     public List<Question> findByDifficulty(
         @PathVariable String difficulty
     ) {
-        return questionService.findAllByTopic(difficulty);
+        return questionService.findAllByDifficulty(difficulty);
     }
 
     @GetMapping("/topic/{topic}/diff/{difficulty}")

@@ -41,11 +41,39 @@ public class UserController {
         return userService.findByUsername(username);
     }
 
+    /*
+    * Creates user entity and stores in database with hashed password.
+    * Returns error if username and/or email are taken.
+    * example input: {
+    *   username: user123,
+    *   password: pass123,
+    *   email: user123@email.com
+    * }
+    * example output: {
+     *   username: user123,
+     *   password: {password_hash},
+     *   email: user123@email.com
+     * }
+    */
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     User create(@Valid UserDTO user) {
         return userService.create(user);
     }
 
+    /*
+     * Updates user entity. Ignores password update if null. Username cannot be changed.
+     * Returns error if new email is already taken.
+     * example input: {
+     *   username: user123,
+     *   password: pass123,
+     *   email: user123@email.com
+     * }
+     * example output: {
+     *   username: user123,
+     *   password: {password_hash},
+     *   email: user123@email.com
+     * }
+     */
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     User update(@Valid UserDTO user) {
         return userService.update(user);
