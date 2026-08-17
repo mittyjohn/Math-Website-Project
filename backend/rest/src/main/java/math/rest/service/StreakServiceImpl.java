@@ -42,7 +42,7 @@ public class StreakServiceImpl implements StreakService {
         StreakDef streakDef = streakDefService.findById(streak_id);
         Streak streak = streakRepository
             .findByUserAndStreakDef(user, streakDef)
-            .orElseThrow(() -> new ResourceNotFoundException("Streak", ""));
+            .orElseThrow(() -> new ResourceNotFoundException("Streak"));
         return mapper.toDTO(streak);
     }
 
