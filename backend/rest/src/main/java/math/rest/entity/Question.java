@@ -1,6 +1,8 @@
 package math.rest.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +28,8 @@ public class Question {
 
     private String topic;
 
-    private String difficulty;
+    @Enumerated(EnumType.STRING)
+    private QuestionDifficulty difficulty;
 
     private String description;
 

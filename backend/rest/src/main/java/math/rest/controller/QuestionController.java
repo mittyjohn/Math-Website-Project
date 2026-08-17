@@ -1,7 +1,9 @@
 package math.rest.controller;
 
 import lombok.AllArgsConstructor;
+import math.rest.dto.QuestionDTO;
 import math.rest.entity.Question;
+import math.rest.entity.QuestionDifficulty;
 import math.rest.service.QuestionService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +24,11 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+
+    @GetMapping("/diff")
+    public QuestionDifficulty[] findByDifficulty() {
+        return QuestionDifficulty.values();
+    }
 
     @GetMapping("/all")
     public List<Question> allQuestions() {
@@ -46,7 +53,8 @@ public class QuestionController {
     public List<Question> findByDifficulty(
         @PathVariable String difficulty
     ) {
-        return questionService.findAllByDifficulty(difficulty);
+        QuestionDifficulty qd = QuestionDifficulty.valueOf(difficulty.toUpperCase());
+        return questionService.findAllByDifficulty(qd);
     }
 
     @GetMapping("/topic/{topic}/diff/{difficulty}")
@@ -54,16 +62,17 @@ public class QuestionController {
         @PathVariable String topic,
         @PathVariable String difficulty
     ) {
-        return questionService.findAllByTopicAndDifficulty(topic, difficulty);
+        QuestionDifficulty qd = QuestionDifficulty.valueOf(difficulty.toUpperCase());
+        return questionService.findAllByTopicAndDifficulty(topic, qd);
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Question create(Question question) {
+    Question create(QuestionDTO question) {
         return questionService.create(question);
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Question update(Question question) {
+    Question update(QuestionDTO question) {
         return questionService.update(question);
     }
 

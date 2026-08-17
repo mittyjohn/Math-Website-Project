@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS questions (
     );
 
 INSERT INTO questions (topic, difficulty, description)
-SELECT 'arithmetic', 'easy', 'What is 2 + 2?'
+SELECT 'arithmetic', 'EASY', 'What is 2 + 2?'
     WHERE NOT EXISTS (SELECT * FROM questions WHERE ID=1);
 
 INSERT INTO questions (topic, difficulty, description)
-SELECT 'arithmetic', 'easy', 'What is 3 * 5?'
+SELECT 'arithmetic', 'EASY', 'What is 3 * 5?'
     WHERE NOT EXISTS (SELECT * FROM questions WHERE ID=2);
 
 
