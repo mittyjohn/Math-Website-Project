@@ -1,5 +1,6 @@
 package math.rest.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import math.rest.dto.StreakDTO;
 import math.rest.entity.Streak;
@@ -45,12 +46,12 @@ public class StreakController {
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    StreakDTO create(StreakDTO streak) {
+    StreakDTO create(@Valid StreakDTO streak) {
         return streakService.create(streak);
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    StreakDTO update(StreakDTO streak) {
+    StreakDTO update(@Valid StreakDTO streak) {
         return streakService.update(streak);
     }
 

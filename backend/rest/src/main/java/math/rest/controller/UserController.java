@@ -1,5 +1,6 @@
 package math.rest.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import math.rest.dto.UserDTO;
 import math.rest.dto.LoginDTO;
@@ -41,12 +42,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User create(UserDTO user) {
+    User create(@Valid UserDTO user) {
         return userService.create(user);
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    User update(UserDTO user) {
+    User update(@Valid UserDTO user) {
         return userService.update(user);
     }
 

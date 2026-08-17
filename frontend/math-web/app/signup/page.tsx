@@ -13,7 +13,7 @@ export default function page() {
   }
  
   return (
-    <div className="container text-center">
+    <div className="text-center ml-auto mr-auto">
         <h1>Sign Up</h1>
 
         <form onSubmit={onSubmit}>
